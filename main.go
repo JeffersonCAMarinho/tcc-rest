@@ -21,11 +21,11 @@ type Movies struct {
 }
 
 const (
-	host     = "localhost"
+	host     = "bancotcc.postgres.database.azure.com"
 	port     = 5432
-	user     = "postgres"
-	password = "postgres"
-	dbname   = "movies"
+	user     = "jefferson"
+	password = "Postgres@"
+	dbname   = "postgres"
 )
 
 func OpenConnection() *sql.DB {
@@ -46,19 +46,22 @@ func OpenConnection() *sql.DB {
 	return db
 }
 
-func ListarFilmes(w http.ResponseWriter, r *http.Request) {
+func ListarFilmesRest(w http.ResponseWriter, r *http.Request) {
 	db := OpenConnection()
 
 	rows, err := db.Query(`
 							select distinct m.movieid, m.title, m.genres, r.userid, r.rating, r.timestamp, t.tag from movies m 
 							inner join ratings r on r.movieid = m.movieid 
 							inner join tags t on t.movieid = m.movieid
+							order by movieid asc
+							limit 1500
 						`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var films []Movies
+	defer db.Close()
 
 	for rows.Next() {
 		var movies Movies
@@ -72,10 +75,10 @@ func ListarFilmes(w http.ResponseWriter, r *http.Request) {
 	w.Write(filmsBytes)
 
 	defer rows.Close()
-	defer db.Close()
+	// defer db.Close()
 }
 
 func main() {
-	http.HandleFunc("/listarFilmes", ListarFilmes)
+	http.HandleFunc("/listarFilmes", ListarFilmesRest)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
