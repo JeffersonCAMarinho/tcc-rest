@@ -30,7 +30,7 @@ const (
 
 func OpenConnection() *sql.DB {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
+		"password=%s dbname=%s sslmode=require",
 		host, port, user, password, dbname)
 
 	db, err := sql.Open("postgres", psqlInfo)
@@ -53,8 +53,8 @@ func ListarFilmesRest(w http.ResponseWriter, r *http.Request) {
 							select distinct m.movieid, m.title, m.genres, r.userid, r.rating, r.timestamp, t.tag from movies m 
 							inner join ratings r on r.movieid = m.movieid 
 							inner join tags t on t.movieid = m.movieid
+							where m.movieid BETWEEN 1 and 21
 							order by movieid asc
-							limit 1500
 						`)
 	if err != nil {
 		log.Fatal(err)

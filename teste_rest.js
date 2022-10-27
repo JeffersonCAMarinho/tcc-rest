@@ -1,7 +1,19 @@
 import http from 'k6/http';
 
+export const options = {
+  discardResponseBodies: true,
+  scenarios: {
+    contacts: {
+      executor: 'per-vu-iterations',
+      vus: 100
+      iterations: 1,
+      maxDuration: '150s',
+    },
+  },
+};
+
 export default function () {
-  const url = 'http://localhost:8080/listarFilmes';
+  const url = 'http://ec2-184-72-88-165.compute-1.amazonaws.com:8080/listarFilmes';
   const payload = JSON.stringify({
     email: 'aaa',
     password: 'bbb',
@@ -14,5 +26,7 @@ export default function () {
     },
   };
 
-  http.get(url, params);
+  const res  = http.get(url, params);
+  // console.log(JSON.stringify(res.body));
+
 }
